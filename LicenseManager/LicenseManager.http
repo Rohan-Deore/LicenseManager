@@ -1,6 +1,6 @@
 @LicenseManager_HostAddress = http://localhost:5132
 
-GET {{LicenseManager_HostAddress}}/weatherforecast/
+GET {{LicenseManager_HostAddress}}/License/
 Accept: application/json
 
 ###

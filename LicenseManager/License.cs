@@ -1,13 +1,20 @@
 namespace LicenseManager
 {
+    /// <summary>
+    /// User name, start date, end date, machine details (MAC ID)
+    /// returns no string on successful check 
+    /// or error message for user on failure.
+    /// 
+    /// Save everything in database
+    /// </summary>
     public class License
     {
-        public DateOnly Date { get; set; }
+        public string? UserName { get; set; }
 
-        public int TemperatureC { get; set; }
+        public DateOnly StartDate { get; set; }
 
-        public int TemperatureF => 32 + (int)(TemperatureC / 0.5556);
+        public DateOnly EndDate { get; set; }
 
-        public string? Summary { get; set; }
+        public string? MachineID { get; set; }
     }
 }

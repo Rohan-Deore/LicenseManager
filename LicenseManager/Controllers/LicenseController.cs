@@ -6,11 +6,6 @@ namespace LicenseManager.Controllers
     [Route("[controller]")]
     public class LicenseController : ControllerBase
     {
-        private static readonly string[] Summaries = new[]
-        {
-            "Freezing", "Bracing", "Chilly", "Cool", "Mild", "Warm", "Balmy", "Hot", "Sweltering", "Scorching"
-        };
-
         private readonly ILogger<LicenseController> _logger;
 
         public LicenseController(ILogger<LicenseController> logger)
@@ -21,11 +16,13 @@ namespace LicenseManager.Controllers
         [HttpGet(Name = "GetLicense")]
         public IEnumerable<License> Get()
         {
+            _logger.LogCritical("Get for license called");
             return Enumerable.Range(1, 5).Select(index => new License
             {
-                Date = DateOnly.FromDateTime(DateTime.Now.AddDays(index)),
-                TemperatureC = Random.Shared.Next(-20, 55),
-                Summary = Summaries[Random.Shared.Next(Summaries.Length)]
+                UserName = $"User name {index}",
+                StartDate = DateOnly.FromDateTime(DateTime.Now.AddDays(index)),
+                EndDate = DateOnly.FromDateTime(DateTime.Now.AddDays(index)),
+                MachineID = $"MachineID {index}"
             })
             .ToArray();
         }
