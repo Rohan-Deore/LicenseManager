@@ -1,6 +1,6 @@
 namespace LicenseManager
 {
-    public class WeatherForecast
+    public class License
     {
         public DateOnly Date { get; set; }
 
