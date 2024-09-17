@@ -2,3 +2,7 @@
 /LicenseManager/bin
 /LicenseManager/obj
 /LicenseManager/publish
+/DatabaseManager/obj/
+/DatabaseManager/bin/
+/LicenseApp/bin/
+/LicenseApp/obj/

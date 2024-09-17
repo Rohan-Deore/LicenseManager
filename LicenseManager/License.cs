@@ -10,11 +10,15 @@ namespace LicenseManager
     public class License
     {
         public string? UserName { get; set; }
+        
+        public string? ApplicationName { get; set; }
 
         public DateOnly StartDate { get; set; }
 
         public DateOnly EndDate { get; set; }
 
         public string? MachineID { get; set; }
+
+        public string? AppError { get; set; }
     }
 }
