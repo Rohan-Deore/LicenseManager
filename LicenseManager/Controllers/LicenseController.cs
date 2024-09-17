@@ -13,16 +13,16 @@ namespace LicenseManager.Controllers
             _logger = logger;
         }
 
-        [HttpGet(Name = "GetLicense")]
-        public IEnumerable<License> Get()
+        [HttpGet("{UserName},{MachineID}", Name = "GetLicense")]
+        public IEnumerable<License> Get(string UserName, string MachineID)
         {
             _logger.LogCritical("Get for license called");
             return Enumerable.Range(1, 5).Select(index => new License
             {
-                UserName = $"User name {index}",
+                UserName = $"User name {UserName}",
                 StartDate = DateOnly.FromDateTime(DateTime.Now.AddDays(index)),
                 EndDate = DateOnly.FromDateTime(DateTime.Now.AddDays(index)),
-                MachineID = $"MachineID {index}"
+                MachineID = $"MachineID {MachineID}"
             })
             .ToArray();
         }
