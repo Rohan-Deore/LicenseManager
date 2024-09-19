@@ -27,4 +27,11 @@ namespace LicenseManager
 
         public string? AppError { get; set; }
     }
+
+    public class LicenseCheckResult
+    { 
+        public bool IsLicensed { get; set; }
+
+        public string ErrorMessage { get; set; } = string.Empty;
+    }
 }

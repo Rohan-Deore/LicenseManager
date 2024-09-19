@@ -1,3 +1,4 @@
+using DatabaseManager;
 using Microsoft.AspNetCore.Mvc;
 
 namespace LicenseManager.Controllers
@@ -7,24 +8,31 @@ namespace LicenseManager.Controllers
     public class LicenseController : ControllerBase
     {
         private readonly ILogger<LicenseController> _logger;
+        LicenseDB licenseDB = new LicenseDB();
 
         public LicenseController(ILogger<LicenseController> logger)
         {
             _logger = logger;
         }
 
-        [HttpGet("{UserName},{MachineID}", Name = "GetLicense")]
-        public IEnumerable<License> Get(string UserName, string MachineID)
+        [HttpGet("", Name = "GetTables")]
+        public LicenseCheckResult Get()
+        {
+            _logger.LogInformation("Get for creating table");
+            licenseDB.CreateTables();
+
+            return new LicenseCheckResult(); 
+        }
+
+        [HttpGet("{UserName}, {CompanyName}, {ApplicationName}, {MachineID}", Name = "GetLicense")]
+        public LicenseCheckResult Get(string UserName, string CompanyName, string ApplicationName, string MachineID)
         {
             _logger.LogInformation("Get for license called");
-            return Enumerable.Range(1, 5).Select(index => new License
-            {
-                UserName = $"User name {UserName}",
-                StartDate = DateOnly.FromDateTime(DateTime.Now.AddDays(index)),
-                EndDate = DateOnly.FromDateTime(DateTime.Now.AddDays(index)),
-                MachineID = $"MachineID {MachineID}"
-            })
-            .ToArray();
+            
+            string errMsg = string.Empty;
+            var isValid = licenseDB.CheckLicense(UserName, CompanyName, ApplicationName, MachineID, ref errMsg);
+            
+            return new LicenseCheckResult() { IsLicensed = isValid, ErrorMessage = errMsg };
         }
     }
 }
