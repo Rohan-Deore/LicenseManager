@@ -1,15 +1,18 @@
 ﻿using Microsoft.Data.Sqlite;
+using NLog;
 
 namespace DatabaseManager
 {
     public class LicenseDB
     {
         private SqliteConnection? connection = null;
+        private Logger logger = LogManager.GetCurrentClassLogger();
 
         public LicenseDB()
         {
             connection = new SqliteConnection("Data Source=LicenseDB.db");
             connection.Open();
+            logger.Info("SQLite connection created.");
         }
 
         public void Dispose()
@@ -19,6 +22,8 @@ namespace DatabaseManager
                 connection.Close();
                 connection.Dispose();
             }
+
+            LogManager.Shutdown();
         }
 
         /// <summary>
@@ -26,24 +31,43 @@ namespace DatabaseManager
         /// </summary>
         public void CreateTables()
         {
-            var command = connection!.CreateCommand();
-            command!.CommandText = @"
-                    CREATE TABLE LicenseTbl (
-                        UserID INT PRIMARY KEY  NOT NULL,
+            if (connection == null)
+            {
+                logger.Error("Connection not created.");
+                return;
+            }
+
+            var command = connection?.CreateCommand();
+            command.CommandText = @"
+                    CREATE TABLE IF NOT EXISTS LicenseTbl (
+                        UserID INTEGER PRIMARY KEY AUTOINCREMENT,
                         UserName TEXT,
+                        CompanyName TEXT,
                         ApplicationName TEXT,
                         StartDate TEXT,
-                        EndDate TEXT
+                        EndDate TEXT,
+                        IsLicensed BOOLEAN
                     );";
 
             command.ExecuteNonQuery();
 
-            command!.CommandText = @"
-                    CREATE TABLE LicenseLogTbl (
+            command.CommandText = @"
+                    CREATE TABLE IF NOT EXISTS LicenseLogTbl (
+                        LogDateTime TEXT,
                         UserID INT,
-                        MachineID INT,
+                        MachineID TEXT,
                         ErrorMsg TEXT
                     );";
+
+            command.ExecuteNonQuery();
+        }
+
+        public void AddUser(string userName, string companyName, string applicationName, bool isLicensed, DateOnly startDate, DateOnly endDate)
+        {
+            var command = connection!.CreateCommand();
+
+            command.CommandText = $@"INSERT INTO LicenseTbl(UserName, CompanyName, ApplicationName, StartDate, EndDate, IsLicensed)
+                    VALUES ('{userName}', '{companyName}', '{applicationName}', '{startDate}', '{endDate}', '{isLicensed}');";
 
             command.ExecuteNonQuery();
         }
@@ -67,16 +91,6 @@ namespace DatabaseManager
         //    }
 
         //    return list;
-        //}
-
-        //public void AddCustomerDB(Customer customer)
-        //{
-        //    List<Customer> list = new List<Customer>();
-        //    var command = connection.CreateCommand();
-        //    command.CommandText = $@"INSERT INTO CustomerData
-        //            VALUES ('{customer.CustomerName}', '{customer.CustomerLocation}');";
-
-        //    command.ExecuteNonQuery();
         //}
 
         //public void DeleteCustomerDB(Customer customer)

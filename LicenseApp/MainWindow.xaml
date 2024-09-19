@@ -5,18 +5,38 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:LicenseApp"
         mc:Ignorable="d"
-        Title="License Manager" Height="450" Width="800">
-    <Grid>
+        Title="License Manager" Height="270" Width="800">
+    <Grid Margin="10">
         <Grid.ColumnDefinitions>
+            <ColumnDefinition/>
             <ColumnDefinition/>
             <ColumnDefinition/>
             <ColumnDefinition/>
         </Grid.ColumnDefinitions>
         <Grid.RowDefinitions>
-            <RowDefinition/>
-            <RowDefinition/>
+            <RowDefinition Height="80"/>
+            <RowDefinition Height="40"/>
+            <RowDefinition Height="40"/>
+            <RowDefinition Height="40"/>
         </Grid.RowDefinitions>
+        
         <Button Grid.Column="0" Grid.Row="0" Height="30" Width="100" Click="ConnectDbBtn_Click">Connect Database</Button>
         <Button Grid.Column="1" Grid.Row="0" Height="30" Width="100" Click="CreateBtn_Click">Create Table</Button>
+        
+        <Label Grid.Column="0" Grid.Row="1" Height="30" MinWidth="100" Content="User Name" HorizontalAlignment="Center"/>
+        <TextBox x:Name="UserNameTB" Grid.Column="1" Grid.Row="1" Height="30" MinWidth="100" />
+        <Label Grid.Column="2" Grid.Row="1" Height="30" MinWidth="100" Content="Application Name" HorizontalAlignment="Center"/>
+        <TextBox x:Name="ApplicationNameTB" Grid.Column="3" Grid.Row="1" Height="30" MinWidth="100" />
+
+        <Label Grid.Column="0" Grid.Row="2" Height="30" MinWidth="100" Content="Company Name" HorizontalAlignment="Center"/>
+        <TextBox x:Name="CompanyNameTB" Grid.Column="1" Grid.Row="2" Height="30" MinWidth="100" />
+
+        <Label Grid.Column="2" Grid.Row="2" Height="30" MinWidth="100" Content="Is licensed" HorizontalAlignment="Center"/>
+        <CheckBox x:Name="IsLicensed" Grid.Column="3" Grid.Row="2" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+
+        <Label Grid.Column="0" Grid.Row="3" Height="30" MinWidth="100" Content="Start End Dates" HorizontalAlignment="Center"/>
+        <DatePicker x:Name="StartDateCtl" Grid.Column="1" Grid.Row="3" Height="30" MinWidth="100" ></DatePicker>
+        <DatePicker x:Name="EndDateCtl" Grid.Column="2" Grid.Row="3" Height="30" MinWidth="100" ></DatePicker>
+        <Button Grid.Column="3" Grid.Row="3" Height="30" Width="100" Click="AddUserBtn_Click">Add user</Button>
     </Grid>
 </Window>

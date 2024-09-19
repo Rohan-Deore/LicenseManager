@@ -6,10 +6,16 @@ namespace LicenseManager
     /// or error message for user on failure.
     /// 
     /// Save everything in database
+    /// 
+    /// Before start date application is in trial mode and after end date application not valid
     /// </summary>
     public class License
     {
+        public int UserID { get; set; }
+
         public string? UserName { get; set; }
+
+        public string? CompanyName { get; set; }
         
         public string? ApplicationName { get; set; }
 
