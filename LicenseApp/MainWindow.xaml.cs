@@ -1,13 +1,4 @@
-﻿using System.Text;
-using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
+﻿using System.Windows;
 using DatabaseManager;
 using NLog;
 
@@ -61,8 +52,13 @@ namespace LicenseApp
                 return;
             }
 
-            licenseDB.AddUser(UserNameTB.Text, CompanyNameTB.Text, ApplicationNameTB.Text, IsLicensed.IsChecked.Value,
+            var status = licenseDB.AddUser(UserNameTB.Text, CompanyNameTB.Text, ApplicationNameTB.Text, IsLicensed.IsChecked.Value,
                 DateOnly.FromDateTime(StartDateCtl.SelectedDate.Value), DateOnly.FromDateTime(EndDateCtl.SelectedDate.Value));
+
+            if (!status)
+            {
+                MessageBox.Show("Entry already exists.");
+            }
         }
     }
 }

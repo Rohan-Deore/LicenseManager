@@ -62,14 +62,56 @@ namespace DatabaseManager
             command.ExecuteNonQuery();
         }
 
-        public void AddUser(string userName, string companyName, string applicationName, bool isLicensed, DateOnly startDate, DateOnly endDate)
+        public bool AddUser(string userName, string companyName, string applicationName, bool isLicensed, DateOnly startDate, DateOnly endDate)
         {
             var command = connection!.CreateCommand();
 
-            command.CommandText = $@"INSERT INTO LicenseTbl(UserName, CompanyName, ApplicationName, StartDate, EndDate, IsLicensed)
-                    VALUES ('{userName}', '{companyName}', '{applicationName}', '{startDate}', '{endDate}', '{isLicensed}');";
+            // Check if the record exists
+            command.CommandText = @"
+                SELECT COUNT(1) 
+                FROM LicenseTbl 
+                WHERE UserName = @UserName AND CompanyName = @CompanyName AND ApplicationName = @ApplicationName";
 
-            command.ExecuteNonQuery();
+            command.Parameters.AddWithValue("@UserName", userName);
+            command.Parameters.AddWithValue("@CompanyName", companyName);
+            command.Parameters.AddWithValue("@ApplicationName", applicationName);
+
+            int count = Convert.ToInt32(command.ExecuteScalar());
+
+            if (count == 0)
+            {
+                // Insert the record if it does not exist
+                command.CommandText = @"
+                    INSERT INTO LicenseTbl(UserName, CompanyName, ApplicationName, StartDate, EndDate, IsLicensed)
+                    VALUES (@UserName, @CompanyName, @ApplicationName, @StartDate, @EndDate, @IsLicensed);
+                    SELECT last_insert_rowid();";
+
+                command.Parameters.AddWithValue("@StartDate", startDate);
+                command.Parameters.AddWithValue("@EndDate", endDate);
+                command.Parameters.AddWithValue("@IsLicensed", isLicensed);
+
+                var userId = (long)command.ExecuteScalar();
+
+                logger.Info($"Inserted user ID: {userId}");
+
+                var logCommand = connection!.CreateCommand();
+
+                logCommand.CommandText = @"
+                    INSERT INTO LicenseLogTbl(LogDateTime, UserID, MachineID, ErrorMsg)
+                    VALUES (@LogDateTime, @UserID, @MachineID, @ErrorMsg)";
+                logCommand.Parameters.AddWithValue("@LogDateTime", DateTime.Now);
+                logCommand.Parameters.AddWithValue("@UserID", userId);
+                logCommand.Parameters.AddWithValue("@MachineID", "");
+                logCommand.Parameters.AddWithValue("@ErrorMsg", "User added");
+                logCommand.ExecuteNonQuery();
+
+                return true;
+            }
+            else 
+            {
+                logger.Error($"Entry with {userName}, {companyName}, {applicationName} already exists.");
+                return false;
+            }
         }
 
         //public List<Customer> GetCustomerAll()
