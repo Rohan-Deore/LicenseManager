@@ -60,5 +60,34 @@ namespace LicenseApp
                 MessageBox.Show("Entry already exists.");
             }
         }
+
+        private void TestBtn_Click(object sender, RoutedEventArgs e)
+        {
+            string userName = System.Environment.UserName;
+            if (licenseDB == null)
+            {
+                logger.Error("Database instance not created.");
+                return;
+            }
+
+            if (string.IsNullOrEmpty(UserNameTB.Text) ||
+                string.IsNullOrEmpty(ApplicationNameTB.Text) ||
+                string.IsNullOrEmpty(CompanyNameTB.Text))
+            {
+                logger.Error("User name or application name is not entered");
+                MessageBox.Show("Fill all required content.");
+
+                return;
+            }
+
+            var errorMsg = string.Empty;
+            var status = licenseDB.CheckLicense(UserNameTB.Text, CompanyNameTB.Text, 
+                ApplicationNameTB.Text, userName, ref errorMsg);
+
+            if (!status)
+            {
+                MessageBox.Show(errorMsg);
+            }
+        }
     }
 }

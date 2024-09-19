@@ -3,7 +3,7 @@ using NLog;
 
 namespace DatabaseManager
 {
-    public class LicenseDB
+     public class LicenseDB
     {
         private SqliteConnection? connection = null;
         private Logger logger = LogManager.GetCurrentClassLogger();
@@ -114,75 +114,76 @@ namespace DatabaseManager
             }
         }
 
-        //public List<Customer> GetCustomerAll()
-        //{
-        //    List<Customer> list = new List<Customer>();
-        //    var command = connection.CreateCommand();
-        //    command.CommandText = @"SELECT *
-        //                        FROM CustomerData";
-        //    using (var reader = command.ExecuteReader())
-        //    {
-        //        while (reader.Read())
-        //        {
-        //            var customerName = reader.GetString(0);
-        //            var customerLoc = reader.GetString(1);
+        public bool CheckLicense(string userName, string companyName, string applicationName, string machineID, ref string errorMessage)
+        { 
+            bool status = false;
 
-        //            list.Add(new Customer() { CustomerName = customerName, CustomerLocation = customerLoc });
-        //            Console.WriteLine($"Hello, {customerName}!");
-        //        }
-        //    }
+            var command = connection!.CreateCommand();
 
-        //    return list;
-        //}
+            // Check if the record exists
+            command.CommandText = @"
+                SELECT * 
+                FROM LicenseTbl 
+                WHERE UserName = @UserName AND CompanyName = @CompanyName AND ApplicationName = @ApplicationName";
 
-        //public void DeleteCustomerDB(Customer customer)
-        //{
-        //    var command = connection.CreateCommand();
-        //    command.CommandText = $@"DELETE FROM CustomerData 
-        //        WHERE CustomerName='{customer.CustomerName}' AND 
-        //        CustomerLocation='{customer.CustomerLocation}';";
+            command.Parameters.AddWithValue("@UserName", userName);
+            command.Parameters.AddWithValue("@CompanyName", companyName);
+            command.Parameters.AddWithValue("@ApplicationName", applicationName);
 
-        //    command.ExecuteNonQuery();
-        //}
+            var licenseReader = command.ExecuteReader();
+            if(!licenseReader.Read())
+            {
+                errorMessage = "Invalid details";
+                return false;
+            }
 
-        //internal List<Orders> GetOrderAll()
-        //{
-        //    List<Orders> list = new List<Orders>();
-        //    var command = connection.CreateCommand();
-        //    command.CommandText = @"SELECT *
-        //                        FROM OrderData";
-        //    using (var reader = command.ExecuteReader())
-        //    {
-        //        while (reader.Read())
-        //        {
-        //            var partID = reader.GetString(0);
-        //            var partName = reader.GetString(1);
+            var userID = licenseReader.GetInt32(0);
 
-        //            list.Add(new Orders() { PartID = partID, PartName = partName });
-        //        }
-        //    }
+            var startDate = DateOnly.Parse(licenseReader.GetString(4)); // start date
+            var endDate = DateOnly.Parse(licenseReader.GetString(5)); // end date
+            var isLicensed = licenseReader.GetInt32(6) == 1; // bool is licensed
 
-        //    return list;
-        //}
+            var dateToday = DateOnly.FromDateTime(DateTime.Today);
+            errorMessage = string.Empty;
+            if (dateToday <= startDate)
+            {
+                // trial period
+                errorMessage = "Trial period";
+                status = true;
+            }
+            else if (dateToday > startDate && dateToday <= endDate)
+            {
+                // licensed preriod
+                if (isLicensed)
+                {
+                    errorMessage = "Valid license";
+                    status = true;
+                }
+                else
+                {
+                    errorMessage = "Invalid license";
+                    status = false;
+                }
+            }
+            else
+            {
+                // not licensed
+                errorMessage = "Not licensed";
+                status = false;
+            }
 
-        //public void AddOrdersDB(Orders orders)
-        //{
-        //    List<Orders> list = new List<Orders>();
-        //    var command = connection.CreateCommand();
-        //    command.CommandText = $@"INSERT INTO OrderData
-        //            VALUES ('{orders.PartID}', '{orders.PartName}');";
+            var logCommand = connection!.CreateCommand();
 
-        //    command.ExecuteNonQuery();
-        //}
+            logCommand.CommandText = @"
+                    INSERT INTO LicenseLogTbl(LogDateTime, UserID, MachineID, ErrorMsg)
+                    VALUES (@LogDateTime, @UserID, @MachineID, @ErrorMsg)";
+            logCommand.Parameters.AddWithValue("@LogDateTime", DateTime.Now);
+            logCommand.Parameters.AddWithValue("@UserID", userID);
+            logCommand.Parameters.AddWithValue("@MachineID", machineID);
+            logCommand.Parameters.AddWithValue("@ErrorMsg", errorMessage);
+            logCommand.ExecuteNonQuery();
 
-        //public void DeleteOrdersDB(Orders order)
-        //{
-        //    var command = connection.CreateCommand();
-        //    command.CommandText = $@"DELETE FROM OrderData 
-        //        WHERE PartID='{order.PartID}' AND 
-        //        PartName='{order.PartName}';";
-
-        //    command.ExecuteNonQuery();
-        //}
+            return status;
+        }
     }
 }
