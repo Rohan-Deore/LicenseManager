@@ -16,7 +16,7 @@ namespace LicenseManager.Controllers
         [HttpGet("{UserName},{MachineID}", Name = "GetLicense")]
         public IEnumerable<License> Get(string UserName, string MachineID)
         {
-            _logger.LogCritical("Get for license called");
+            _logger.LogInformation("Get for license called");
             return Enumerable.Range(1, 5).Select(index => new License
             {
                 UserName = $"User name {UserName}",
