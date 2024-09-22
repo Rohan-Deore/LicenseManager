@@ -15,14 +15,14 @@ namespace LicenseManager.Controllers
             _logger = logger;
         }
 
-        [HttpGet("", Name = "GetTables")]
-        public LicenseCheckResult Get()
-        {
-            _logger.LogInformation("Get for creating table");
-            licenseDB.CreateTables();
+        //[HttpGet("", Name = "GetTables")]
+        //public LicenseCheckResult Get()
+        //{
+        //    _logger.LogInformation("Get for creating table");
+        //    licenseDB.CreateTables();
 
-            return new LicenseCheckResult(); 
-        }
+        //    return new LicenseCheckResult(); 
+        //}
 
         [HttpGet("{UserName}, {CompanyName}, {ApplicationName}, {MachineID}", Name = "GetLicense")]
         public LicenseCheckResult Get(string UserName, string CompanyName, string ApplicationName, string MachineID)

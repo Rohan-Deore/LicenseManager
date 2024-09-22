@@ -10,7 +10,8 @@ namespace DatabaseManager
 
         public LicenseDB()
         {
-            connection = new SqliteConnection("Data Source=LicenseDB.db");
+            var fileName = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "LicenseManager/LicenseDB.db");
+            connection = new SqliteConnection($"Data Source={fileName}");
             connection.Open();
             logger.Info("SQLite connection created.");
         }
