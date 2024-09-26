@@ -61,6 +61,8 @@ namespace DatabaseManager
                     );";
 
             command.ExecuteNonQuery();
+
+            AddUser("Rohan", "Segen", "LicenseManager", true, new DateOnly(2024, 9, 25), new DateOnly(2024, 9, 28));
         }
 
         public bool AddUser(string userName, string companyName, string applicationName, bool isLicensed, DateOnly startDate, DateOnly endDate)
